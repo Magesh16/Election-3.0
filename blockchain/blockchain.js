@@ -55,9 +55,6 @@ class BlockChain {
     }
     }
 
-
-
-
 let a = new Block({name:"Magesh",count:"1000"});
 let b = new Block({name:"kishore",count:"700"});
 let c = new Block({name:"Buji",count:"900"});
@@ -72,3 +69,5 @@ chain.addNewBlock(d);
 console.log(chain);
 chain.display();
 console.log("Validity: " + chain.checkChainValidity())
+
+module.exports = { Block, BlockChain };
