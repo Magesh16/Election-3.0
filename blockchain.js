@@ -5,16 +5,14 @@ class Block {
         this.timestamp = Date.now();
         this.date = new Date();
         this.data = data; 
-        this.prevHash = prevHash; 
+        this.prevHash = prevHash;   
         this.hash = this.computeHash();
     }
     
-  
-    computeHash() { 
+    computeHash(){ 
         let strBlock = this.prevHash + this.timestamp +JSON.stringify(this.data) + this.date;
         return crypto.createHash("sha256").update(strBlock).digest("hex");
     }
-
 }
 
 class BlockChain {
@@ -42,7 +40,6 @@ class BlockChain {
                 return false
             }
           
-            
             if(currBlock.prevHash !== prevBlock.hash) {                 
               return false
             }
