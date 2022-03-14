@@ -1,17 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const blockchainInstance = require('../blockchain/blockchain');
-const block = require('../blockchain/block');
 
-let blockchain;
+let blockchain = new blockchainInstance.BlockChain();
 
 router.get('/test', (req, res) => {
     res.send('Hello World');
 })
 
 router.get('/start/blockchain', (req, res) => {
-    blockchain = new blockchainInstance.BlockChain();
-    res.send("blockchain created");
+    res.send(blockchain);
+    
 })
 
 router.post('/insert/block', (req, res) => {
@@ -21,8 +20,15 @@ router.post('/insert/block', (req, res) => {
         "name" : name,
         "count" : count
     }
-    blockchain.addNewBlock(blockData);
+    const block = new blockchainInstance.Block(blockData);
+    blockchain.addNewBlock(block);
     res.send("block added");
 })
+
+// 1.Testing blockchain
+// 2.Role Authentication
+// 3.Kuberneties
+// 4.Docker
+
 
 module.exports = router;
