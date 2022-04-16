@@ -9,6 +9,7 @@ const secretKey = 'l338NMmyd4TUBamPILFABGUgr/CF5ueATatPBybS2yeV79BsgqmVWRkA55apn
 let blockchain = new blockchainInstance.BlockChain();
 let testBlockChain = new blockchainInstance.BlockChain();
 
+let count=0;
 router.get('/test', (req, res) => {
     res.send('Hello World');
 })
@@ -30,33 +31,35 @@ router.post('/login', (req, res) => {
 })
 
 router.post('/test/vote', (req, res) => {
-    const accessToken = req.body.accessToken;
-    jwt.verify(accessToken, secretKey, (err, user) => {
-        if(err){
-            res.status(500).send("token verification failed");
+    const name = req.body.name;
+    const VotingId = req.body.votingId;
+    const party = req.body.Party;
+    if(blockchain.isValidatingVotingId(VotingId, this.blockchain)){
+        res.status(500).send("votingId already exists");
+    }
+    else{
+        let date_ob = new Date();
+        let date = ("0" + date_ob.getDate()).slice(-2);
+        let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+        let year = date_ob.getFullYear();
+        let hours = date_ob.getHours();
+        let minutes = date_ob.getMinutes();
+        let seconds = date_ob.getSeconds();
+        let timestamp = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
+        count = count+1;
+        const blockData = {
+            "name" : name,
+            "votingId": VotingId,
+            "Party": party,
+            "count":count,
+            "timestamp": timestamp
         }
-        else{
-            const party = req.body.party;
-            const district = req.body.district;
-            let date_ob = new Date();
-            let date = ("0" + date_ob.getDate()).slice(-2);
-            let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
-            let year = date_ob.getFullYear();
-            let hours = date_ob.getHours();
-            let minutes = date_ob.getMinutes();
-            let seconds = date_ob.getSeconds();
-            let timestamp = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
-            const blockData = {
-                'party': party,
-                'district': district,
-                'timestamp': timestamp
-            }
-            const block = new blockchainInstance.Block(blockData);
-            testBlockChain.addNewBlock(block);
-            testBlockChain.display();
-            res.status(200).send("voted in test mode successfully");
-        }
-    })
+        
+        const block = new blockchainInstance.Block(blockData);
+        blockchain.addNewBlock(block);
+        blockchain.display();
+        res.send("block added");
+    }
 })
 
 router.post('/verifyToken', (req, res) => {
@@ -73,15 +76,38 @@ router.post('/verifyToken', (req, res) => {
 
 router.post('/insert/block', (req, res) => {
     const name = req.body.name;
-    const count = req.body.count;
-    const blockData = {
-        "name" : name,
-        "count" : count
+    const VotingId = req.body.votingId;
+    const party = req.body.Party;
+    if(blockchain.isValidatingVotingId(VotingId, this.blockchain)){
+        res.status(500).send("votingId already exists");
     }
-    const block = new blockchainInstance.Block(blockData);
-    blockchain.addNewBlock(block);
-    res.send("block added");
+    else{
+        let date_ob = new Date();
+        let date = ("0" + date_ob.getDate()).slice(-2);
+        let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+        let year = date_ob.getFullYear();
+        let hours = date_ob.getHours();
+        let minutes = date_ob.getMinutes();
+        let seconds = date_ob.getSeconds();
+        let timestamp = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
+        count = count+1;
+        const blockData = {
+            "name" : name,
+            "votingId": VotingId,
+            "Party": party,
+            "count":count,
+            "timestamp": timestamp
+        }
+        
+        const block = new blockchainInstance.Block(blockData);
+        blockchain.addNewBlock(block);
+        blockchain.display();
+        res.send("block added");
+    }
+    
+        
 })
+
 
 // 1.Testing blockchain
 // 2.Role Authentication

@@ -27,6 +27,15 @@ class BlockChain {
     obtainLatestBlock() {
         return this.blockchain[this.blockchain.length - 1]
     }
+    isValidatingVotingId (votingId){
+        
+        for(let i=0;i<this.blockchain.length;i++){
+            if(this.blockchain[i].data.votingId === votingId){
+                return true;
+            }
+        }
+        return false;
+    }
     addNewBlock(newBlock) { // Add a new block
         newBlock.prevHash = this.obtainLatestBlock().hash; 
         newBlock.hash = newBlock.computeHash() ;
@@ -58,19 +67,19 @@ class BlockChain {
     }
     }
 
-let a = new Block({name:"Magesh",count:"1000"});
-let b = new Block({name:"kishore",count:"700"});
-let c = new Block({name:"Buji",count:"900"});
-let d = new Block({name:"Avi",count:"676"});
+// let a = new Block({name:"Magesh",count:"1000"});
+// let b = new Block({name:"kishore",count:"700"});
+// let c = new Block({name:"Buji",count:"900"});
+// let d = new Block({name:"Avi",count:"676"});
 
  
-let chain = new BlockChain() // Init our chain
-chain.addNewBlock(a); 
-chain.addNewBlock(b); 
-chain.addNewBlock(c);
-chain.addNewBlock(d);
-console.log(chain);
-chain.display();
-console.log("Validity: " + chain.checkChainValidity())
+// let chain = new BlockChain() // Init our chain
+// chain.addNewBlock(a); 
+// chain.addNewBlock(b); 
+// chain.addNewBlock(c);
+// chain.addNewBlock(d);
+// console.log(chain);
+// chain.display();
+// console.log("Validity: " + chain.checkChainValidity())
 
 module.exports = { Block, BlockChain };
