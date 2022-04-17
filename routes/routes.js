@@ -1,8 +1,12 @@
 const express = require('express');
+const mongoose =require ('mongoose');
+const voteSchema = require ('../models/voteSchema');
 const router = express.Router();
 const blockchainInstance = require('../blockchain/blockchain');
 const generateAccessToken = require('../middleware/generateToken');
 const jwt = require('jsonwebtoken');
+const { db } = require('../models/voteSchema');
+const { json } = require('express/lib/response');
 
 const secretKey = 'l338NMmyd4TUBamPILFABGUgr/CF5ueATatPBybS2yeV79BsgqmVWRkA55apniNO7FpgrrLvvVaM/QyOATOVZA==';
 
@@ -13,6 +17,7 @@ let count=0;
 router.get('/test', (req, res) => {
     res.send('Hello World');
 })
+
 
 router.post('/login', (req, res) => {
     const username = req.body.username;
@@ -74,7 +79,7 @@ router.post('/verifyToken', (req, res) => {
     })
 })
 
-router.post('/insert/block', (req, res) => {
+router.post('/insert/block', async(req, res) => {
     const name = req.body.name;
     const VotingId = req.body.votingId;
     const party = req.body.Party;
@@ -102,6 +107,57 @@ router.post('/insert/block', (req, res) => {
         const block = new blockchainInstance.Block(blockData);
         blockchain.addNewBlock(block);
         blockchain.display();
+
+        let dbData = await voteSchema.find();
+        if(dbData.length === 0){
+            jwt.sign({blockchain}, secretKey, async(err, token) => {
+                if(err){
+                    console.log(err);
+                }
+                else{
+                  try{
+                    let votes = new voteSchema({
+                        "blockchain": token
+                   })
+                   await votes.save();
+                  }catch(err){
+                    console.log(err);
+                  }
+                }
+            });
+        }
+        else if(dbData.length > 0){
+
+            let id = dbData[0]._id;
+            try{
+                jwt.sign({blockchain}, secretKey, async(err, token) => {
+                    if(err){
+                        console.log(err);
+                    }
+                    else{
+                await voteSchema.updateOne({_id: id}, {$set: {blockchain: token}});
+                    }
+                });
+            }
+            catch(err){
+                console.log(err);
+            }
+            
+        }
+        
+        const decryptedData = await voteSchema.find({});
+        const decryptedKey = decryptedData[0].blockchain;
+        jwt.verify(decryptedKey, secretKey, (err, user) => {
+            if(err){
+                console.log(err);
+            }else{
+                console.log(user);
+                for(let i=0;i<user.blockchain.blockchain.length;i++){
+                    console.log(JSON.parse(JSON.stringify(user.blockchain.blockchain[i])));
+                }
+            }
+        });
+
         res.send("block added");
     }
     
