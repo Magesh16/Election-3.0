@@ -1,4 +1,4 @@
-const { generatePrime } = require('crypto');
+// const { generatePrime } = require('crypto');
 const jwt = require('jsonwebtoken');
 
 const secretKey = 'l338NMmyd4TUBamPILFABGUgr/CF5ueATatPBybS2yeV79BsgqmVWRkA55apniNO7FpgrrLvvVaM/QyOATOVZA==';

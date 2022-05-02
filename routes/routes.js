@@ -1,17 +1,13 @@
 const express = require('express');
-const mongoose =require ('mongoose');
 const voteSchema = require ('../models/voteSchema');
 const router = express.Router();
 const blockchainInstance = require('../blockchain/blockchain');
 const generateAccessToken = require('../middleware/generateToken');
 const jwt = require('jsonwebtoken');
-const { db } = require('../models/voteSchema');
-const { json } = require('express/lib/response');
 
-const secretKey = 'l338NMmyd4TUBamPILFABGUgr/CF5ueATatPBybS2yeV79BsgqmVWRkA55apniNO7FpgrrLvvVaM/QyOATOVZA==';
 
 let blockchain = new blockchainInstance.BlockChain();
-let testBlockChain = new blockchainInstance.BlockChain();
+// let testBlockChain = new blockchainInstance.BlockChain();
 
 let count=0;
 router.get('/test', (req, res) => {
@@ -80,6 +76,7 @@ router.post('/verifyToken', (req, res) => {
 })
 
 router.post('/insert/block', async(req, res) => {
+    if(blockchain.checkChainValidity()){
     const name = req.body.name;
     const VotingId = req.body.votingId;
     const party = req.body.Party;
@@ -161,7 +158,10 @@ router.post('/insert/block', async(req, res) => {
         res.send("block added");
     }
     
-        
+}
+else{
+    res.status(500).send("invalid chain");
+}    
 })
 
 
