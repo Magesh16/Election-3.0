@@ -1,9 +1,14 @@
 const crypto = require('crypto'); 
+const voteSchema = require ('../models/voteSchema');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
+const secretKey = process.env.secretKey;
 class Block { 
     constructor(data, prevHash = "") {
         this.timestamp = Date.now();
         this.date = new Date();
-        this.data = data; 
+        this.data = data;
         this.prevHash = prevHash; 
         this.hash = this.computeHash();
     }  
@@ -62,7 +67,27 @@ class BlockChain {
             console.log(this.blockchain[i].data);
         }
     }
+    syncDatabase = async () => {
+        const dbData = await voteSchema.find();
+        console.log(dbData);
+        if(dbData.length >0){
+            let decryptedData = dbData[0].blockchain.blockchain;
+            jwt.verify(decryptedData, secretKey, (err, user) => {
+                if(err){
+                    console.log(err);
+                }else{
+                    console.log(user);
+                    for(let i=0;i<user.length;i++){
+                        let block = new Block(user[i]);
+                        this.blockchain.addNewBlock(block);
+                        console.log(JSON.parse(JSON.stringify(block)));
+                    }
+                }
+            }
+            );
     }
+}
+
 
 // let a = new Block({name:"Magesh",count:"1000"});
 // let b = new Block({name:"kishore",count:"700"});
@@ -78,5 +103,5 @@ class BlockChain {
 // console.log(chain);
 // chain.display();
 // console.log("Validity: " + chain.checkChainValidity())
-
+}
 module.exports = { Block, BlockChain };

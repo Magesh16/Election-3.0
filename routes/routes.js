@@ -4,9 +4,13 @@ const router = express.Router();
 const blockchainInstance = require('../blockchain/blockchain');
 const generateAccessToken = require('../middleware/generateToken');
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
+const secretKey = process.env.secretKey;
 
 
 let blockchain = new blockchainInstance.BlockChain();
+blockchain.syncDatabase();
 // let testBlockChain = new blockchainInstance.BlockChain();
 
 let count=0;
@@ -124,7 +128,6 @@ router.post('/insert/block', async(req, res) => {
             });
         }
         else if(dbData.length > 0){
-
             let id = dbData[0]._id;
             try{
                 jwt.sign({blockchain}, secretKey, async(err, token) => {
@@ -132,7 +135,9 @@ router.post('/insert/block', async(req, res) => {
                         console.log(err);
                     }
                     else{
-                await voteSchema.updateOne({_id: id}, {$set: {blockchain: token}});
+                await voteSchema.updateOne({_id: id}, {$set: {blockchain: token}}).catch(err => {
+                    console.log(err);
+                });
                     }
                 });
             }
@@ -149,9 +154,9 @@ router.post('/insert/block', async(req, res) => {
                 console.log(err);
             }else{
                 console.log(user);
-                for(let i=0;i<user.blockchain.blockchain.length;i++){
-                    console.log(JSON.parse(JSON.stringify(user.blockchain.blockchain[i])));
-                }
+                // for(let i=0;i<user.blockchain.blockchain.length;i++){
+                //      console.log(JSON.parse(JSON.stringify(user.blockchain.blockchain[i])));
+                // }
             }
         });
 
