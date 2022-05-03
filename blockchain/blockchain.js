@@ -79,7 +79,7 @@ class BlockChain {
                     console.log(user);
                     for(let i=0;i<user.length;i++){
                         let block = new Block(user[i]);
-                        this.blockchain.addNewBlock(block);
+                        this.addNewBlock(block);
                         console.log(JSON.parse(JSON.stringify(block)));
                     }
                 }
