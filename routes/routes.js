@@ -10,7 +10,6 @@ const secretKey = process.env.secretKey;
 
 
 let blockchain = new blockchainInstance.BlockChain();
-blockchain.syncDatabase();
 // let testBlockChain = new blockchainInstance.BlockChain();
 
 let count=0;

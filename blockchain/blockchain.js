@@ -20,10 +20,11 @@ class Block {
 }
 
 class BlockChain {
-    constructor() {
-        this.blockchain = [this.startGenesisBlock()]
+    constructor(){
+        this.blockchain = [this.startGenesisBlock()];
+        this.syncDatabase();
     }
-    startGenesisBlock() {
+    startGenesisBlock(){
         return new Block({})
     }
     obtainLatestBlock() {
@@ -69,18 +70,17 @@ class BlockChain {
     }
     syncDatabase = async () => {
         const dbData = await voteSchema.find();
-        console.log(dbData);
+        // console.log(dbData);
         if(dbData.length >0){
-            let decryptedData = dbData[0].blockchain.blockchain;
+            let decryptedData = dbData[0].blockchain;
             jwt.verify(decryptedData, secretKey, (err, user) => {
                 if(err){
                     console.log(err);
                 }else{
-                    console.log(user);
-                    for(let i=0;i<user.length;i++){
-                        let block = new Block(user[i]);
+                    for(let i=0;i<user.blockchain.blockchain.length;i++){
+                        let block = new Block(user.blockchain.blockchain[i]);
+                        console.log('block : '+JSON.stringify(block)+"\n");
                         this.addNewBlock(block);
-                        console.log(JSON.parse(JSON.stringify(block)));
                     }
                 }
             }
