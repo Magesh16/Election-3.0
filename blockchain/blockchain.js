@@ -16,7 +16,6 @@ class Block {
         let strBlock = this.prevHash + this.timestamp +JSON.stringify(this.data) + this.date;
         return crypto.createHash("sha256").update(strBlock).digest("hex");
     }
-
 }
 
 class BlockChain {
@@ -68,9 +67,21 @@ class BlockChain {
             console.log(this.blockchain[i].data);
         }
     }
+    countForParties(){
+        let count = {};
+        for(let i = 0; i < this.blockchain.length; i++){
+            if(count[this.blockchain[i].data.party]){
+                count[this.blockchain[i].data.party] += 1;
+            }
+            else{
+                count[this.blockchain[i].data.party] = 1;
+            }
+        }
+        console.table(count);
+    }
     syncDatabase = async () => {
         const dbData = await voteSchema.find();
-        // console.log(dbData);
+        console.log(dbData);
         if(dbData.length >0){
             let decryptedData = dbData[0].blockchain;
             jwt.verify(decryptedData, secretKey, (err, user) => {
@@ -78,8 +89,9 @@ class BlockChain {
                     console.log(err);
                 }else{
                     for(let i=0;i<user.blockchain.blockchain.length;i++){
+                        
                         let block = new Block(user.blockchain.blockchain[i]);
-                        console.log('block : '+JSON.stringify(block)+"\n");
+                        console.log('block : '+JSON.stringify(block));
                         this.addNewBlock(block);
                     }
                 }
@@ -89,19 +101,5 @@ class BlockChain {
 }
 
 
-// let a = new Block({name:"Magesh",count:"1000"});
-// let b = new Block({name:"kishore",count:"700"});
-// let c = new Block({name:"Buji",count:"900"});
-// let d = new Block({name:"Avi",count:"676"});
-
- 
-// let chain = new BlockChain() // Init our chain
-// chain.addNewBlock(a); 
-// chain.addNewBlock(b); 
-// chain.addNewBlock(c);
-// chain.addNewBlock(d);
-// console.log(chain);
-// chain.display();
-// console.log("Validity: " + chain.checkChainValidity())
 }
 module.exports = { Block, BlockChain };
